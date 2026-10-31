@@ -1,4 +1,6 @@
+using System;
 using GDD.Common;
+using GDD.Connector;
 using UnityEngine;
 
 namespace GDD.Player
@@ -18,6 +20,12 @@ namespace GDD.Player
         private void Awake()
         {
             rb = GetComponent<Rigidbody2D>();
+            ServiceLocator.Register<PlayerController>(this);
+        }
+
+        private void OnDestroy()
+        {
+            ServiceLocator.Unregister<PlayerController>();
         }
 
         private Vector2 ReturnCalculatedAcceleration()
