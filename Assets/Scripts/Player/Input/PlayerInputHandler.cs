@@ -9,7 +9,7 @@ namespace GDD.Player.Input
     {
         [ReadOnly] [SerializeField] private PlayerController playerController;
 
-        private void Awake()
+        private void Start()
         {
             playerController = ServiceLocator.Get<PlayerController>();
         }
