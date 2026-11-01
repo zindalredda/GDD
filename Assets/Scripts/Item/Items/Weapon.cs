@@ -38,7 +38,7 @@ namespace GDD.Item.Items
         public bool Attack()
         {
             // TODO: 모션 연동 및 공격 판정
-            Debug.Log($"Cutlass Attacked! Damage: {damage}, Range: {range}");
+            Debug.Log($"{type} Attacked! Damage: {damage}, Range: {range}");
             return true;
         }
     }

@@ -350,6 +350,10 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
+    - rid: 8867555400682045521
+      type: {class: 'Provider2DCache`1[[UnityEngine.Rendering.Universal.Light2DProvider, Unity.RenderPipelines.Universal.2D.Runtime]]', ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.2D.Runtime}
+      data:
+        m_Cache: []
     - rid: 8983826546745671682
       type: {class: Light2DProviderSources, ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.2D.Runtime}
       data:
@@ -357,7 +361,7 @@ MonoBehaviour:
         m_SelectedSource:
           rid: -2
         m_Provider2DCache:
-          rid: -2
+          rid: 8867555400682045521
 --- !u!4 &619394802
 Transform:
   m_ObjectHideFlags: 0
@@ -569,7 +573,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68c785edee3f46d384c9def341f8fde7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GDD.Player.PlayerInventory
-  currentWeapon: {fileID: 0}
+  currentWeapon: {fileID: 11400000, guid: 95c487cee5dcb49e4800824db122e260, type: 2}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

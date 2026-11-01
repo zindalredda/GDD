@@ -19,7 +19,7 @@ namespace GDD.Player.Input
             playerController.targetVector = value.Get<Vector2>();
         }
 
-        public void OnAttack(InputValue value, float delay)
+        public void OnAttack(InputValue value)
         {
             playerController.Attack();
         }

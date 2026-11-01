@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ddbaf558d574d2eb097959590469555, type: 3}
   m_Name: Cutlass
   m_EditorClassIdentifier: Assembly-CSharp::GDD.Item.Items.Weapon.Cutlass
-  itemID: 
-  itemName: 
+  itemID: W001
+  itemName: Default_Cutlass
   description: 
   icon: {fileID: 0}
   category: 0
@@ -22,6 +22,7 @@ MonoBehaviour:
   weight: 1
   isDroppable: 1
   isTradable: 1
-  damage: 10
+  damage: 3
   range: 1.5
-  delay: 0.5
+  delay: 1
+  type: 0
