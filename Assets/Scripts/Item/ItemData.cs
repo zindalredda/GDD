@@ -3,6 +3,7 @@ using UnityEngine;
 namespace GDD.Item
 {
     [CreateAssetMenu(fileName = "NewItemData", menuName = "Pirate/Item Data")]
+    [System.Serializable]
     public class ItemData : ScriptableObject
     {
         [Header("기본 정보")]

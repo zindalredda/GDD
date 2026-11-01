@@ -38,6 +38,18 @@ namespace GDD.Player
             return Vector2.Lerp(rb.linearVelocity, targetVel, targetAccel * Time.deltaTime);
         }
 
+        public void Attack()
+        {
+            var currentWeapon = ServiceLocator.Get<PlayerInventory>().currentWeapon;
+            if (currentWeapon == null)
+            {
+                Debug.Log("No Weapon in Inventory");
+                return;
+            }
+            
+            currentWeapon.Attack();
+        }
+
         public void FixedUpdate()
         {
             rb.linearVelocity = ReturnCalculatedAcceleration();
