@@ -1,6 +1,7 @@
 using System;
 using GDD.Common;
 using GDD.Connector;
+using GDD.Item.Items;
 using UnityEngine;
 
 namespace GDD.Player
@@ -14,7 +15,9 @@ namespace GDD.Player
 
         [Header("디버그용 변수들")]
         [ReadOnly] [SerializeField] private Rigidbody2D rb;
-
+        [ReadOnly] [SerializeField] private float weaponDelay;
+        [ReadOnly] [SerializeField] private float lastAttackedTime;
+        
         public Vector2 targetVector;
 
         private void Awake()
@@ -35,7 +38,7 @@ namespace GDD.Player
             
             var targetAccel = targetVector.magnitude > 0 ? acceleration : deceleration;
 
-            return Vector2.Lerp(rb.linearVelocity, targetVel, targetAccel * Time.deltaTime);
+            return Vector2.Lerp(rb.linearVelocity, targetVel, targetAccel * Time.fixedDeltaTime);
         }
 
         public void Attack()
@@ -46,8 +49,20 @@ namespace GDD.Player
                 Debug.Log("No Weapon in Inventory");
                 return;
             }
-            
+
+            if (!IsWeaponAttackable(currentWeapon))
+            {
+                Debug.Log($"{currentWeapon.name} is on Delay");
+                return;
+            }
             currentWeapon.Attack();
+            lastAttackedTime = Time.time;
+        }
+
+        private bool IsWeaponAttackable(Weapon weapon)
+        {
+            weaponDelay = weapon.Delay;
+            return Time.time >= lastAttackedTime + weaponDelay;
         }
 
         public void FixedUpdate()
