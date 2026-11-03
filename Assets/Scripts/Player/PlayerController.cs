@@ -4,6 +4,7 @@ using GDD.Common;
 using GDD.Connector;
 using GDD.Item.Items;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace GDD.Player
 {
@@ -16,6 +17,7 @@ namespace GDD.Player
 
         [Header("디버그용 변수들")]
         [ReadOnly] [SerializeField] private Rigidbody2D rb;
+        [ReadOnly] [SerializeField] private float previousRotation = 0;
         [ReadOnly] [SerializeField] private List<float> previousVelocity = new() { 0f, 0f };
         [ReadOnly] [SerializeField] private float weaponDelay;
         [ReadOnly] [SerializeField] private float lastAttackedTime;
@@ -56,11 +58,17 @@ namespace GDD.Player
         private Vector3 ReturnCalculatedRotation()
         {
             var direction = targetVector.normalized;
-            var directionX = direction.x;
-            var directionY = direction.y;
-            
 
-            return new Vector3();
+            if (direction.magnitude <= 0.1f)
+                return new Vector3(0, 0, previousRotation);
+            
+            var angle = Mathf.Atan2(-direction.x, direction.y) * Mathf.Rad2Deg;
+            if (angle < 0)
+                angle += 360;
+            
+            previousRotation = Mathf.Round(angle / 45f) * 45f % 360f;
+            
+            return new Vector3(0, 0, previousRotation);
         }
 
         public void Attack()
@@ -90,7 +98,7 @@ namespace GDD.Player
         public void FixedUpdate()
         {
             rb.linearVelocity = ReturnCalculatedAcceleration();
-
+            this.transform.eulerAngles = ReturnCalculatedRotation();
         }
 
         // 로그용
