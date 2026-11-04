@@ -112,6 +112,11 @@ namespace GDD.Player
             
             Debug.Log($"VelX : {previousVelocity[0]} VelY : {previousVelocity[1]} TargetAccel : {targetAcceleration} CurrentAccel : {currentAcceleration}");
         }
+
+        public void Interact()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 

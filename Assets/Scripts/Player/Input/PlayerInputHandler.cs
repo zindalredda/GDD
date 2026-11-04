@@ -23,5 +23,10 @@ namespace GDD.Player.Input
         {
             playerController.Attack();
         }
+
+        public void OnInteract(InputValue value)
+        {
+            playerController.Interact();
+        }
     }
 }
