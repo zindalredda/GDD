@@ -31,7 +31,18 @@ namespace GDD.Player.Inventory
 
         public void UpdateDisplay(InventoryData data)
         {
+            mainWeapon.ChangeData(data.weapon);
             
+            slot1.ChangeData(data.slot1);
+            slot2.ChangeData(data.slot2);
+            slot3.ChangeData(data.slot3);
+            slot4.ChangeData(data.slot4);
+            slot5.ChangeData(data.slot5);
+            slot6.ChangeData(data.slot6);
+            slot7.ChangeData(data.slot7);
+            slot8.ChangeData(data.slot8);
+            slot9.ChangeData(data.slot9);
+            slot10.ChangeData(data.slot10);
         }
     }
 }

@@ -9,7 +9,6 @@ namespace GDD.Player
 {
     public class PlayerInventory : MonoBehaviour
     {
-        public Weapon currentWeapon;
         private InventoryData _inventory;
 
         public void Awake()
@@ -20,6 +19,17 @@ namespace GDD.Player
         public void OnDestroy()
         {
             ServiceLocator.Unregister<PlayerInventory>();
+        }
+
+        public InventoryData GetInventory()
+        {
+            return _inventory;
+        }
+
+        public void SetInventory(InventoryData inventory)
+        {
+            _inventory = inventory;
+            ServiceLocator.Get<SlotDisplayController>().UpdateDisplay(_inventory);
         }
     }
 }

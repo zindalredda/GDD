@@ -1,4 +1,5 @@
 ﻿using GDD.Item;
+using GDD.Item.Items;
 
 namespace GDD.Player.Inventory
 {
@@ -9,6 +10,8 @@ namespace GDD.Player.Inventory
         public int gold;
         public int coin;
 
+        public Weapon weapon;
+        
         public ItemStack slot1;
         public ItemStack slot2;
         public ItemStack slot3;
