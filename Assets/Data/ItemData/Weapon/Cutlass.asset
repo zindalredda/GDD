@@ -15,7 +15,7 @@ MonoBehaviour:
   itemID: W001
   itemName: Default_Cutlass
   description: 
-  icon: {fileID: 0}
+  icon: {fileID: 131470934923594671, guid: 3761eb55f053adb48acdc20807f108a4, type: 3}
   category: 0
   baseValue: 0
   maxStackSize: 99
