@@ -1,17 +1,17 @@
-﻿using System;
-using GDD.Common;
+﻿using GDD.Common;
 using GDD.Item;
 using GDD.Item.Items;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace GDD.Player.Inventory
+namespace GDD.UI
 {
     public class SlotDisplay : MonoBehaviour
     {
         [ReadOnly] [SerializeField] private Image image;
         [ReadOnly] [SerializeField] private TMP_Text text;
+        public int num;
 
         private void Awake()
         {

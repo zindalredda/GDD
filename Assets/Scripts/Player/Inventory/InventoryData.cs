@@ -1,26 +1,20 @@
-﻿using GDD.Item;
-using GDD.Item.Items;
+﻿using System.Collections.Generic;
+using GDD.Item;
 
 namespace GDD.Player.Inventory
 {
     [System.Serializable]
     public class InventoryData
     {
+        // 매우 중요!!!!!
+        public int maxInventory = 4;
+        
         public int rum;
         public int gold;
         public int coin;
 
         public ItemStack weapon;
-        
-        public ItemStack slot1;
-        public ItemStack slot2;
-        public ItemStack slot3;
-        public ItemStack slot4;
-        public ItemStack slot5;
-        public ItemStack slot6;
-        public ItemStack slot7;
-        public ItemStack slot8;
-        public ItemStack slot9;
-        public ItemStack slot10;
+
+        public List<ItemStack> slots;
     }
 }

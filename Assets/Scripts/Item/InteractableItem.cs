@@ -1,4 +1,5 @@
-﻿using GDD.Common;
+﻿using System;
+using GDD.Common;
 using GDD.Connector;
 using GDD.Player;
 using UnityEngine;
@@ -15,12 +16,23 @@ namespace GDD.Item
             _inventory = ServiceLocator.Get<PlayerInventory>();
         }
         
-        private void OnCollisionEnter(Collision collision)
+        private void OnTriggerEnter2D(Collider2D other)
         {
-            var player = collision.gameObject;
-            var distance = Vector3.Distance(player.transform.position, transform.position);
-            
-            _inventory.SetInteractable(_itemInfo, distance);
+            Debug.Log($"트리거 감지: {other.gameObject.name} / {other.gameObject.tag}");
+
+            if (other.CompareTag("PlayerInteractableRange"))
+            {
+                float distance = Vector2.Distance(transform.position, other.transform.position);
+                _inventory.SetInteractable(_itemInfo, distance);
+            }
+        }
+
+        private void OnTriggerExit2D(Collider2D other)
+        {
+            if (other.CompareTag("PlayerInteractableRange"))
+            {
+                _inventory.SetInteractable(_itemInfo, 0, true);
+            }
         }
     }
 }
