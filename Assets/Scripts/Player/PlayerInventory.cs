@@ -14,8 +14,8 @@ namespace GDD.Player
     {
         [ReadOnly] [SerializeField] private InventoryData _inventory;
         [SerializeField] private Weapon weapon;
-        [ReadOnly] [SerializeField] private ItemStack _interactableItem = null;
-        [ReadOnly] [SerializeField] private float _interactableItemDistance = float.MaxValue;
+        [ReadOnly] [SerializeField] private ItemStack _interactableItem;
+        [ReadOnly] [SerializeField] private float _interactableItemDistance;
         [ReadOnly] [SerializeField] private InteractableDisplayController _interactableDisplayController;
 
         public void Awake()
@@ -42,11 +42,14 @@ namespace GDD.Player
         private void Start()
         {
             _inventory.weapon = new ItemStack(weapon, 1);
+            _interactableItem = null;
+            _interactableItemDistance = float.MaxValue;
             _interactableDisplayController = ServiceLocator.Get<InteractableDisplayController>();
         }
 
         public void SetInteractable(ItemStack item, float distance, bool reset = false)
         {
+            Debug.Log($"{item} {distance} {reset}\n{_interactableItem} {_interactableItemDistance}");
             if (reset)
             {
                 _interactableItem = null;
