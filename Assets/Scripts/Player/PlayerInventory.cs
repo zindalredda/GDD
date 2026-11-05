@@ -54,11 +54,13 @@ namespace GDD.Player
 
         private void FixedUpdate()
         {
-            if (itemsCount == 0)
+            // Guard: no interactable items → clear UI
+            if (itemsCount == 0 || _interactableItems == null || _interactableItems.Count == 0)
             {
                 interactableItem = null;
                 interactableItemObj = null;
                 _interactableDisplayController.ChangeText(null, null);
+                itemsCount = 0;
                 return;
             }
 
@@ -127,7 +129,16 @@ namespace GDD.Player
             
             _interactableItems.RemoveAll(x => x.Item2 == interactableItemObj);
             
+            // 인터랙션 UI 업데이트: itemData가 없으면 UI를 비우고, 있으면 표시
+        if (interactableItem != null && interactableItem.itemData != null)
+        {
             _interactableDisplayController.ChangeText(interactableItem, null);
+        }
+        else
+        {
+            // 아이템이 없거나 데이터가 없을 경우 텍스트를 비웁니다.
+            _interactableDisplayController.ChangeText(null, null);
+        }
             SetInventory(currentInv);
             Destroy(interactableItemObj);
         }
