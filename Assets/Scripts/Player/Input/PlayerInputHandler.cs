@@ -1,4 +1,5 @@
-﻿using GDD.Common;
+﻿using System;
+using GDD.Common;
 using GDD.Connector;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -13,7 +14,7 @@ namespace GDD.Player.Input
         {
             playerController = ServiceLocator.Get<PlayerController>();
         }
-        
+
         public void OnMove(InputValue value)
         {
             playerController.targetVector = value.Get<Vector2>();

@@ -17,6 +17,7 @@ namespace GDD.Player
         [ReadOnly] [SerializeField] private ItemStack _interactableItem;
         [ReadOnly] [SerializeField] private float _interactableItemDistance;
         [ReadOnly] [SerializeField] private InteractableDisplayController _interactableDisplayController;
+        [ReadOnly] [SerializeField] private GameObject obj;
 
         public void Awake()
         {
@@ -45,9 +46,10 @@ namespace GDD.Player
             _interactableItem = null;
             _interactableItemDistance = float.MaxValue;
             _interactableDisplayController = ServiceLocator.Get<InteractableDisplayController>();
+            SetInventory(_inventory);
         }
 
-        public void SetInteractable(ItemStack item, float distance, GameObject obj = null, bool reset = false)
+        public void SetInteractable(ItemStack item, float distance, GameObject _obj = null, bool reset = false)
         {
             Debug.Log($"{item} {distance} {reset}\n{_interactableItem} {_interactableItemDistance}");
             if (reset)
@@ -60,6 +62,7 @@ namespace GDD.Player
 
             if (_interactableItem == null || distance < _interactableItemDistance || _interactableItem == item)
             {
+                obj = _obj;
                 var isDifferentItem = (_interactableItem != item);
 
                 _interactableItem = item;
@@ -72,16 +75,38 @@ namespace GDD.Player
             }
         }
 
-        public void AddItem(ItemStack item, bool isInteractable = false)
+        public void AddItem(ItemStack item, bool isDropItem = false)
         {
-            if (_inventory.maxInventory == _inventory.slots.Count)
+            var _item = isDropItem ? _interactableItem : item;
+
+            if (_item == null)
             {
-                //TODO: 꽉 차 있다는 메세지 보내기
-                Debug.Log("Inventory is Full!!");
+                Debug.Log("상호작용할 수 있는 아이템이 없습니다.");
                 return;
             }
             
+            var currentInv = _inventory;
+            var exist = currentInv.slots.FindIndex(slot => slot.itemData == _item.itemData);
             
+            if (exist != -1)
+            {
+                currentInv.slots[exist].amount += _item.amount;
+            }
+            else
+            {
+                if (currentInv.slots.Count >= currentInv.maxInventory)
+                {
+                    Debug.LogWarning("인벤토리가 가득 차서 아이템을 주울 수 없습니다!");
+                    // TODO: UI 안내 텍스트 출력
+                    return;
+                }
+
+                currentInv.slots.Add(_item);
+            }
+            
+            _interactableDisplayController.ChangeText(_interactableItem, null);
+            SetInventory(currentInv);
+            Destroy(obj);
         }
     }
 }

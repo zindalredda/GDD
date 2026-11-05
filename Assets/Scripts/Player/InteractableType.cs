@@ -1,4 +1,4 @@
-﻿namespace GDD.Item
+﻿namespace GDD.Player
 {
     public enum InteractableType
     {

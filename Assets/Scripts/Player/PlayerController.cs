@@ -22,8 +22,6 @@ namespace GDD.Player
         [ReadOnly] [SerializeField] private float weaponDelay;
         [ReadOnly] [SerializeField] private float lastAttackedTime;
         
-        
-        
         public Vector2 targetVector;
         
 
@@ -115,7 +113,7 @@ namespace GDD.Player
 
         public void Interact()
         {
-            throw new NotImplementedException();
+            ServiceLocator.Get<PlayerInteractController>().Interact();
         }
     }
 }

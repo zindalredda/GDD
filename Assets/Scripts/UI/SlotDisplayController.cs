@@ -32,6 +32,11 @@ namespace GDD.UI
         public void UpdateDisplay(InventoryData data)
         {
             mainWeapon.ChangeData(data.weapon);
+
+            for (var i = 0; i < data.slots.Count; i++)
+            {
+                slots[i].ChangeData(data.slots[i]);
+            }
         }
     }
 }
