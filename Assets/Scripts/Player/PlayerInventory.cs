@@ -47,14 +47,14 @@ namespace GDD.Player
             _interactableDisplayController = ServiceLocator.Get<InteractableDisplayController>();
         }
 
-        public void SetInteractable(ItemStack item, float distance, bool reset = false)
+        public void SetInteractable(ItemStack item, float distance, GameObject obj = null, bool reset = false)
         {
             Debug.Log($"{item} {distance} {reset}\n{_interactableItem} {_interactableItemDistance}");
             if (reset)
             {
                 _interactableItem = null;
                 _interactableItemDistance = float.MaxValue;
-                _interactableDisplayController.ChangeText(_interactableItem);
+                _interactableDisplayController.ChangeText(_interactableItem, obj);
                 return;
             }
 
@@ -67,7 +67,7 @@ namespace GDD.Player
                 
                 if (isDifferentItem || _interactableItem != null)
                 {
-                    _interactableDisplayController?.ChangeText(_interactableItem);
+                    _interactableDisplayController?.ChangeText(_interactableItem, obj, _inventory.maxInventory == _inventory.slots.Count);
                 }
             }
         }
