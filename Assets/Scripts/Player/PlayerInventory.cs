@@ -1,5 +1,6 @@
 using GDD.Common;
 using GDD.Connector;
+using GDD.Item;
 using GDD.Item.Items;
 using GDD.Player.Inventory;
 using UnityEngine;
@@ -35,7 +36,7 @@ namespace GDD.Player
 
         private void Start()
         {
-            _inventory.weapon = weapon;
+            _inventory.weapon = new ItemStack(weapon, 1);
         }
     }
 }

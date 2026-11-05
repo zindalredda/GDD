@@ -73,7 +73,7 @@ namespace GDD.Player
 
         public void Attack()
         {
-            var currentWeapon = ServiceLocator.Get<PlayerInventory>().GetInventory().weapon;
+            var currentWeapon = (Weapon)ServiceLocator.Get<PlayerInventory>().GetInventory().weapon.itemData;
             if (currentWeapon == null)
             {
                 Debug.Log("No Weapon in Inventory");
