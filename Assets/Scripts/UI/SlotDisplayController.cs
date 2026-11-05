@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using GDD.Common;
 using GDD.Connector;
@@ -19,7 +19,7 @@ namespace GDD.UI
 
         private void Start()
         {
-            slots = FindObjectsByType<SlotDisplay>().ToList();
+            slots = FindObjectsByType<SlotDisplay>(FindObjectsSortMode.None).ToList();
             slots.Remove(mainWeapon);
             slots.Sort((a, b) => a.num.CompareTo(b.num));
         }
@@ -33,7 +33,8 @@ namespace GDD.UI
         {
             mainWeapon.ChangeData(data.weapon);
 
-            for (var i = 0; i < data.slots.Count; i++)
+            var count = Mathf.Min(data.slots.Count, slots.Count);
+            for (var i = 0; i < count; i++)
             {
                 slots[i].ChangeData(data.slots[i]);
             }

@@ -7,20 +7,24 @@ using GDD.Player.Inventory;
 using GDD.UI;
 using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace GDD.Player
 {
     public class PlayerInventory : MonoBehaviour
     {
-        [ReadOnly] [SerializeField] private InventoryData _inventory;
+        [Header("설정")]
         [SerializeField] private Weapon weapon;
-        [ReadOnly] [SerializeField] private InteractableDisplayController _interactableDisplayController;
 
+        [Header("디버그 (ReadOnly)")]
+        [ReadOnly] [SerializeField] private InventoryData _inventory;
+        [ReadOnly] [SerializeField] private InteractableDisplayController _interactableDisplayController;
         [ReadOnly] [SerializeField] private ItemStack interactableItem;
         [ReadOnly] [SerializeField] private GameObject interactableItemObj;
-        [ReadOnly] [SerializeField] private int itemsCount;
-        [ReadOnly] [SerializeField] private List<(ItemStack, GameObject, float)> _interactableItems;
+        [ReadOnly] [SerializeField] private List<InteractableEntry> _interactableItems;
+
+        public bool IsInventoryFull => _inventory.slots.Count >= _inventory.maxInventory;
+
+        #region Lifecycle
 
         public void Awake()
         {
@@ -32,10 +36,25 @@ namespace GDD.Player
             ServiceLocator.Unregister<PlayerInventory>();
         }
 
-        public InventoryData GetInventory()
+        private void Start()
         {
-            return _inventory;
+            _inventory.weapon = new ItemStack(weapon, 1);
+            interactableItem = null;
+            _interactableItems = new List<InteractableEntry>();
+            _interactableDisplayController = ServiceLocator.Get<InteractableDisplayController>();
+            SetInventory(_inventory);
         }
+
+        private void FixedUpdate()
+        {
+            UpdateNearestInteractable();
+        }
+
+        #endregion
+
+        #region Inventory
+
+        public InventoryData GetInventory() => _inventory;
 
         public void SetInventory(InventoryData inventory)
         {
@@ -43,111 +62,138 @@ namespace GDD.Player
             ServiceLocator.Get<SlotDisplayController>().UpdateDisplay(_inventory);
         }
 
-        private void Start()
-        {
-            _inventory.weapon = new ItemStack(weapon, 1);
-            interactableItem = null;
-            _interactableItems = new List<(ItemStack, GameObject, float)>();
-            _interactableDisplayController = ServiceLocator.Get<InteractableDisplayController>();
-            SetInventory(_inventory);
-        }
-
-        private void FixedUpdate()
-        {
-            // Guard: no interactable items → clear UI
-            if (_interactableItems == null || _interactableItems.Count == 0)
-            {
-                interactableItem = null;
-                interactableItemObj = null;
-                _interactableDisplayController.ChangeText(null, null);
-                return;
-            }
-
-            // Find the nearest interactable item without sorting the whole list
-            float nearestDist = float.MaxValue;
-            ItemStack nearestItem = null;
-            GameObject nearestObj = null;
-
-            foreach (var tuple in _interactableItems)
-            {
-                if (tuple.Item2 == null) continue;
-                float dist = Vector3.Distance(tuple.Item2.transform.position, transform.position);
-                if (dist < nearestDist)
-                {
-                    nearestDist = dist;
-                    nearestItem = tuple.Item1;
-                    nearestObj = tuple.Item2;
-                }
-            }
-
-            interactableItem = nearestItem;
-            interactableItemObj = nearestObj;
-
-            bool isFull = _inventory.slots.Count >= _inventory.maxInventory;
-            _interactableDisplayController.ChangeText(interactableItem, interactableItemObj, isFull);
-        }
-
-        public void AddToInteractable(ItemStack item, GameObject newObj, bool enter = true)
-        {
-            if (enter)
-            {
-                var alreadyExists = _interactableItems.Exists(x => x.Item2 == newObj);
-                if (!alreadyExists)
-                {
-                    _interactableItems.Add((item, newObj, 0f));
-                }
-            }
-            else
-            {
-                _interactableItems.RemoveAll(x => x.Item2 == newObj);
-            }
-
-            itemsCount = _interactableItems.Count;
-        }
-
         public void AddItem(ItemStack item, bool isDropItem = false)
         {
-            var _item = isDropItem ? interactableItem : item;
+            var targetItem = isDropItem ? interactableItem : item;
 
-            if (_item == null)
+            if (targetItem == null)
             {
                 Debug.Log("상호작용할 수 있는 아이템이 없습니다.");
                 return;
             }
 
-            var currentInv = _inventory;
-            var exist = currentInv.slots.FindIndex(slot => slot.itemData == _item.itemData);
+            if (!TryAddToInventory(targetItem))
+                return;
 
-            if (exist != -1)
+            RemoveInteractable(interactableItemObj);
+            UpdateInteractableUI();
+            SetInventory(_inventory);
+            Destroy(interactableItemObj);
+        }
+
+        /// <summary>
+        /// 인벤토리에 아이템 추가를 시도합니다.
+        /// 이미 존재하는 아이템이면 수량을 합산하고, 새 아이템이면 슬롯에 추가합니다.
+        /// </summary>
+        /// <returns>추가 성공 여부</returns>
+        private bool TryAddToInventory(ItemStack item)
+        {
+            var existIndex = _inventory.slots.FindIndex(slot => slot.itemData == item.itemData);
+
+            if (existIndex != -1)
             {
-                currentInv.slots[exist].amount += _item.amount;
+                _inventory.slots[existIndex].amount += item.amount;
+                return true;
+            }
+
+            if (IsInventoryFull)
+            {
+                Debug.LogWarning("인벤토리가 가득 차서 아이템을 주울 수 없습니다!");
+                // TODO: UI 안내 텍스트 출력
+                return false;
+            }
+
+            _inventory.slots.Add(item);
+            return true;
+        }
+
+        #endregion
+
+        #region Interactable Tracking
+
+        public void AddToInteractable(ItemStack item, GameObject newObj, bool enter = true)
+        {
+            if (enter)
+            {
+                if (!_interactableItems.Exists(x => x.gameObject == newObj))
+                {
+                    _interactableItems.Add(new InteractableEntry(item, newObj));
+                }
             }
             else
             {
-                if (currentInv.slots.Count >= currentInv.maxInventory)
-                {
-                    Debug.LogWarning("인벤토리가 가득 차서 아이템을 주울 수 없습니다!");
-                    // TODO: UI 안내 텍스트 출력
-                    return;
-                }
+                RemoveInteractable(newObj);
+            }
+        }
 
-                currentInv.slots.Add(_item);
+        private void RemoveInteractable(GameObject obj)
+        {
+            _interactableItems.RemoveAll(x => x.gameObject == obj);
+        }
+
+        /// <summary>
+        /// 가장 가까운 상호작용 가능 아이템을 찾아 UI를 갱신합니다.
+        /// </summary>
+        private void UpdateNearestInteractable()
+        {
+            if (_interactableItems == null || _interactableItems.Count == 0)
+            {
+                ClearInteractable();
+                return;
             }
 
-            _interactableItems.RemoveAll(x => x.Item2 == interactableItemObj);
+            FindNearestInteractable(out var nearestItem, out var nearestObj);
+            interactableItem = nearestItem;
+            interactableItemObj = nearestObj;
 
-            // 인터랙션 UI 업데이트: itemData가 없으면 UI를 비우고, 있으면 표시
-            if (interactableItem != null && interactableItem.itemData != null)
+            _interactableDisplayController.ChangeText(interactableItem, interactableItemObj, IsInventoryFull);
+        }
+
+        /// <summary>
+        /// 리스트를 한 번 순회하여 플레이어와 가장 가까운 아이템을 찾습니다.
+        /// </summary>
+        private void FindNearestInteractable(out ItemStack nearestItem, out GameObject nearestObj)
+        {
+            float nearestDist = float.MaxValue;
+            nearestItem = null;
+            nearestObj = null;
+
+            foreach (var entry in _interactableItems)
+            {
+                if (entry.gameObject == null) continue;
+
+                float dist = Vector3.Distance(entry.gameObject.transform.position, transform.position);
+                if (dist < nearestDist)
+                {
+                    nearestDist = dist;
+                    nearestItem = entry.item;
+                    nearestObj = entry.gameObject;
+                }
+            }
+        }
+
+        private void ClearInteractable()
+        {
+            interactableItem = null;
+            interactableItemObj = null;
+            _interactableDisplayController.ChangeText(null, null);
+        }
+
+        /// <summary>
+        /// 아이템 획득 후 인터랙션 UI를 갱신합니다.
+        /// </summary>
+        private void UpdateInteractableUI()
+        {
+            if (interactableItem?.itemData != null)
             {
                 _interactableDisplayController.ChangeText(interactableItem, null);
             }
             else
             {
-                // 아이템이 없거나 데이터가 없을 경우 텍스트를 비웁니다.
                 _interactableDisplayController.ChangeText(null, null);
             }
-            SetInventory(currentInv);
-            Destroy(interactableItemObj);
         }
+
+        #endregion
     }
 }

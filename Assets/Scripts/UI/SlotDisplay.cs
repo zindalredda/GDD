@@ -1,4 +1,4 @@
-﻿using GDD.Common;
+using GDD.Common;
 using GDD.Item;
 using GDD.Item.Items;
 using TMPro;
@@ -27,14 +27,27 @@ namespace GDD.UI
 
         public void ChangeData(ItemStack itemStack)
         {
+            if (itemStack == null || itemStack.itemData == null)
+            {
+                image.sprite = null;
+                text.text = "";
+                return;
+            }
+
             image.sprite = itemStack.itemData.icon;
             image.preserveAspect = true;
-            
             text.text = itemStack.amount.ToString();
         }
 
         public void ChangeData(Weapon weapon)
         {
+            if (weapon == null)
+            {
+                image.sprite = null;
+                text.text = "";
+                return;
+            }
+
             image.sprite = weapon.icon;
             image.preserveAspect = true;
             text.text = "";

@@ -1,4 +1,3 @@
-﻿using System;
 using GDD.Common;
 using GDD.Connector;
 using GDD.Item;
@@ -36,37 +35,33 @@ namespace GDD.UI
         {
             if (obj == null)
                 return;
-
             var pos = Camera.main.WorldToScreenPoint(obj.transform.position + offset);
-
             _rectTransform.position = pos;
         }
 
-        // TODO: 코드 더럽다....
         public void ChangeText(ItemStack item, GameObject _obj, bool isFull = false)
         {
             Debug.Log($"{item} {_obj}");
-            
-            if (item == null)
+
+            if (item == null || item.itemData == null)
             {
                 text.text = "";
+                obj = null;
                 return;
             }
+
             obj = _obj;
+
+            var itemName = item.itemData.itemName;
+            var itemDescription = item.itemData.description;
 
             if (isFull)
             {
-                var itemName = item.itemData.itemName;
-                var itemDescription = item.itemData.description;
-                var _text = $"{itemName}\n{itemDescription}";
+                text.text = $"<color=red>인벤토리 가득 참</color>\n{itemName}";
             }
             else
             {
-                var itemName = item.itemData.itemName;
-                var itemDescription = item.itemData.description;
-                var _text = $"{itemName}\n{itemDescription}";
-
-                text.text = _text;
+                text.text = $"{itemName}\n{itemDescription}";
             }
         }
     }
