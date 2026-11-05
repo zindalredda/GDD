@@ -12,13 +12,13 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - MapBase
+  - MapAnimation
+  - MapWall
+  - MapObject
+  - Item
+  - Enemy
+  - Player
   - 
   - 
   - 
@@ -41,6 +41,27 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: MapBase
+    uniqueID: 3046604991
+    locked: 0
+  - name: MapWall
+    uniqueID: 3332203641
+    locked: 0
+  - name: MapObject
+    uniqueID: 1764085053
+    locked: 0
+  - name: Item
+    uniqueID: 3621950737
+    locked: 0
+  - name: Enemy
+    uniqueID: 2830201663
+    locked: 0
+  - name: Player
+    uniqueID: 3977085583
+    locked: 0
+  - name: UI
+    uniqueID: 796748235
     locked: 0
   m_RenderingLayers:
   - Default
