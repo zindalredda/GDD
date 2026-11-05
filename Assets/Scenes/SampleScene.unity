@@ -3725,7 +3725,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68c785edee3f46d384c9def341f8fde7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GDD.Player.PlayerInventory
-  currentWeapon: {fileID: 11400000, guid: 95c487cee5dcb49e4800824db122e260, type: 2}
+  _inventory:
+    rum: 0
+    gold: 0
+    coin: 0
+    weapon: {fileID: 0}
+    slot1:
+      itemData: {fileID: 0}
+      amount: 0
+    slot2:
+      itemData: {fileID: 0}
+      amount: 0
+    slot3:
+      itemData: {fileID: 0}
+      amount: 0
+    slot4:
+      itemData: {fileID: 0}
+      amount: 0
+    slot5:
+      itemData: {fileID: 0}
+      amount: 0
+    slot6:
+      itemData: {fileID: 0}
+      amount: 0
+    slot7:
+      itemData: {fileID: 0}
+      amount: 0
+    slot8:
+      itemData: {fileID: 0}
+      amount: 0
+    slot9:
+      itemData: {fileID: 0}
+      amount: 0
+    slot10:
+      itemData: {fileID: 0}
+      amount: 0
+  weapon: {fileID: 11400000, guid: 95c487cee5dcb49e4800824db122e260, type: 2}
 --- !u!1 &1850206473
 GameObject:
   m_ObjectHideFlags: 0

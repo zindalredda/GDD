@@ -9,7 +9,8 @@ namespace GDD.Player
 {
     public class PlayerInventory : MonoBehaviour
     {
-        private InventoryData _inventory;
+        [ReadOnly] [SerializeField] private InventoryData _inventory;
+        [SerializeField] private Weapon weapon;
 
         public void Awake()
         {
@@ -30,6 +31,11 @@ namespace GDD.Player
         {
             _inventory = inventory;
             ServiceLocator.Get<SlotDisplayController>().UpdateDisplay(_inventory);
+        }
+
+        private void Start()
+        {
+            _inventory.weapon = weapon;
         }
     }
 }
