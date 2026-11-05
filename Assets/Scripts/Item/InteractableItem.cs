@@ -22,8 +22,7 @@ namespace GDD.Item
 
             if (other.CompareTag("PlayerInteractableRange"))
             {
-                float distance = Vector2.Distance(transform.position, other.transform.position);
-                _inventory.SetInteractable(_itemInfo, distance, this.gameObject);
+                _inventory.AddToInteractable(_itemInfo, this.gameObject);
             }
         }
 
@@ -31,7 +30,7 @@ namespace GDD.Item
         {
             if (other.CompareTag("PlayerInteractableRange"))
             {
-                _inventory.SetInteractable(_itemInfo, 0, this.gameObject,true);
+                _inventory.AddToInteractable(_itemInfo, this.gameObject,false);
             }
         }
     }

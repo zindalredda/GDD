@@ -45,6 +45,13 @@ namespace GDD.UI
         // TODO: 코드 더럽다....
         public void ChangeText(ItemStack item, GameObject _obj, bool isFull = false)
         {
+            Debug.Log($"{item} {_obj}");
+            
+            if (item == null)
+            {
+                text.text = "";
+                return;
+            }
             obj = _obj;
 
             if (isFull)
@@ -53,8 +60,6 @@ namespace GDD.UI
                 var itemDescription = item.itemData.description;
                 var _text = $"{itemName}\n{itemDescription}";
             }
-            else if (item == null)
-                text.text = "";
             else
             {
                 var itemName = item.itemData.itemName;

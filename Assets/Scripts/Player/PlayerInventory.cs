@@ -5,6 +5,7 @@ using GDD.Item;
 using GDD.Item.Items;
 using GDD.Player.Inventory;
 using GDD.UI;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -14,10 +15,12 @@ namespace GDD.Player
     {
         [ReadOnly] [SerializeField] private InventoryData _inventory;
         [SerializeField] private Weapon weapon;
-        [ReadOnly] [SerializeField] private ItemStack _interactableItem;
-        [ReadOnly] [SerializeField] private float _interactableItemDistance;
         [ReadOnly] [SerializeField] private InteractableDisplayController _interactableDisplayController;
-        [ReadOnly] [SerializeField] private GameObject obj;
+
+        [ReadOnly] [SerializeField] private ItemStack interactableItem;
+        [ReadOnly] [SerializeField] private GameObject interactableItemObj;
+        [ReadOnly] [SerializeField] private int itemsCount;
+        [ReadOnly] [SerializeField] private List<(ItemStack, GameObject, float)> _interactableItems;
 
         public void Awake()
         {
@@ -43,41 +46,59 @@ namespace GDD.Player
         private void Start()
         {
             _inventory.weapon = new ItemStack(weapon, 1);
-            _interactableItem = null;
-            _interactableItemDistance = float.MaxValue;
+            interactableItem = null;
+            _interactableItems = new List<(ItemStack, GameObject, float)>();
             _interactableDisplayController = ServiceLocator.Get<InteractableDisplayController>();
             SetInventory(_inventory);
         }
 
-        public void SetInteractable(ItemStack item, float distance, GameObject _obj = null, bool reset = false)
+        private void FixedUpdate()
         {
-            Debug.Log($"{item} {distance} {reset}\n{_interactableItem} {_interactableItemDistance}");
-            if (reset)
+            if (itemsCount == 0)
             {
-                _interactableItem = null;
-                _interactableItemDistance = float.MaxValue;
-                _interactableDisplayController.ChangeText(_interactableItem, obj);
+                interactableItem = null;
+                interactableItemObj = null;
+                _interactableDisplayController.ChangeText(null, null);
                 return;
             }
 
-            if (_interactableItem == null || distance < _interactableItemDistance || _interactableItem == item)
+            for (int i = 0; i < _interactableItems.Count; i++)
             {
-                obj = _obj;
-                var isDifferentItem = (_interactableItem != item);
-
-                _interactableItem = item;
-                _interactableItemDistance = distance;
+                var itemTuple = _interactableItems[i];
                 
-                if (isDifferentItem || _interactableItem != null)
+                var dist = Vector3.Distance(itemTuple.Item2.transform.position, transform.position);
+                _interactableItems[i] = (itemTuple.Item1, itemTuple.Item2, dist);
+            }
+            
+            _interactableItems.Sort((a,b) => a.Item3.CompareTo(b.Item3));
+
+            interactableItem = _interactableItems[0].Item1;
+            interactableItemObj = _interactableItems[0].Item2;
+            
+            _interactableDisplayController.ChangeText(interactableItem, interactableItemObj, _inventory.slots.Count >= _inventory.maxInventory);
+        }
+
+        public void AddToInteractable(ItemStack item, GameObject newObj, bool enter = true)
+        {
+            if (enter)
+            {
+                var alreadyExists = _interactableItems.Exists(x => x.Item2 == newObj);
+                if (!alreadyExists)
                 {
-                    _interactableDisplayController?.ChangeText(_interactableItem, obj, _inventory.maxInventory == _inventory.slots.Count);
+                    _interactableItems.Add((item, newObj, 0f));
                 }
             }
+            else
+            {
+                _interactableItems.RemoveAll(x => x.Item2 == newObj);
+            }
+
+            itemsCount = _interactableItems.Count;
         }
 
         public void AddItem(ItemStack item, bool isDropItem = false)
         {
-            var _item = isDropItem ? _interactableItem : item;
+            var _item = isDropItem ? interactableItem : item;
 
             if (_item == null)
             {
@@ -104,9 +125,11 @@ namespace GDD.Player
                 currentInv.slots.Add(_item);
             }
             
-            _interactableDisplayController.ChangeText(_interactableItem, null);
+            _interactableItems.RemoveAll(x => x.Item2 == interactableItemObj);
+            
+            _interactableDisplayController.ChangeText(interactableItem, null);
             SetInventory(currentInv);
-            Destroy(obj);
+            Destroy(interactableItemObj);
         }
     }
 }
