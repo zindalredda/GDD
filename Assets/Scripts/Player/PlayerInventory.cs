@@ -55,29 +55,36 @@ namespace GDD.Player
         private void FixedUpdate()
         {
             // Guard: no interactable items → clear UI
-            if (itemsCount == 0 || _interactableItems == null || _interactableItems.Count == 0)
+            if (_interactableItems == null || _interactableItems.Count == 0)
             {
                 interactableItem = null;
                 interactableItemObj = null;
                 _interactableDisplayController.ChangeText(null, null);
-                itemsCount = 0;
                 return;
             }
 
-            for (int i = 0; i < _interactableItems.Count; i++)
-            {
-                var itemTuple = _interactableItems[i];
-                
-                var dist = Vector3.Distance(itemTuple.Item2.transform.position, transform.position);
-                _interactableItems[i] = (itemTuple.Item1, itemTuple.Item2, dist);
-            }
-            
-            _interactableItems.Sort((a,b) => a.Item3.CompareTo(b.Item3));
+            // Find the nearest interactable item without sorting the whole list
+            float nearestDist = float.MaxValue;
+            ItemStack nearestItem = null;
+            GameObject nearestObj = null;
 
-            interactableItem = _interactableItems[0].Item1;
-            interactableItemObj = _interactableItems[0].Item2;
-            
-            _interactableDisplayController.ChangeText(interactableItem, interactableItemObj, _inventory.slots.Count >= _inventory.maxInventory);
+            foreach (var tuple in _interactableItems)
+            {
+                if (tuple.Item2 == null) continue;
+                float dist = Vector3.Distance(tuple.Item2.transform.position, transform.position);
+                if (dist < nearestDist)
+                {
+                    nearestDist = dist;
+                    nearestItem = tuple.Item1;
+                    nearestObj = tuple.Item2;
+                }
+            }
+
+            interactableItem = nearestItem;
+            interactableItemObj = nearestObj;
+
+            bool isFull = _inventory.slots.Count >= _inventory.maxInventory;
+            _interactableDisplayController.ChangeText(interactableItem, interactableItemObj, isFull);
         }
 
         public void AddToInteractable(ItemStack item, GameObject newObj, bool enter = true)
@@ -107,10 +114,10 @@ namespace GDD.Player
                 Debug.Log("상호작용할 수 있는 아이템이 없습니다.");
                 return;
             }
-            
+
             var currentInv = _inventory;
             var exist = currentInv.slots.FindIndex(slot => slot.itemData == _item.itemData);
-            
+
             if (exist != -1)
             {
                 currentInv.slots[exist].amount += _item.amount;
@@ -126,19 +133,19 @@ namespace GDD.Player
 
                 currentInv.slots.Add(_item);
             }
-            
+
             _interactableItems.RemoveAll(x => x.Item2 == interactableItemObj);
-            
+
             // 인터랙션 UI 업데이트: itemData가 없으면 UI를 비우고, 있으면 표시
-        if (interactableItem != null && interactableItem.itemData != null)
-        {
-            _interactableDisplayController.ChangeText(interactableItem, null);
-        }
-        else
-        {
-            // 아이템이 없거나 데이터가 없을 경우 텍스트를 비웁니다.
-            _interactableDisplayController.ChangeText(null, null);
-        }
+            if (interactableItem != null && interactableItem.itemData != null)
+            {
+                _interactableDisplayController.ChangeText(interactableItem, null);
+            }
+            else
+            {
+                // 아이템이 없거나 데이터가 없을 경우 텍스트를 비웁니다.
+                _interactableDisplayController.ChangeText(null, null);
+            }
             SetInventory(currentInv);
             Destroy(interactableItemObj);
         }
