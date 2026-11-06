@@ -21,6 +21,7 @@ namespace GDD.Player
         [ReadOnly] [SerializeField] private List<float> previousVelocity = new() { 0f, 0f };
         [ReadOnly] [SerializeField] private float weaponDelay;
         [ReadOnly] [SerializeField] private float lastAttackedTime;
+        [ReadOnly] [SerializeField] private PlayerAnimationController _animationController;
         
         public Vector2 targetVector;
         
@@ -34,6 +35,11 @@ namespace GDD.Player
         private void OnDestroy()
         {
             ServiceLocator.Unregister<PlayerController>();
+        }
+
+        private void Start()
+        {
+            _animationController = ServiceLocator.Get<PlayerAnimationController>();
         }
 
         private Vector2 ReturnCalculatedAcceleration()
@@ -97,20 +103,8 @@ namespace GDD.Player
         {
             rb.linearVelocity = ReturnCalculatedAcceleration();
             this.transform.eulerAngles = ReturnCalculatedRotation();
-            
-            DebugMessage();
-        }
 
-        // 로그용
-        private void DebugMessage()
-        {
-            var targetAcceleration = ReturnCalculatedAcceleration();
-            var currentAcceleration = ((rb.linearVelocityX - previousVelocity[0]) / Time.fixedDeltaTime,
-                (rb.linearVelocityY - previousVelocity[1]) / Time.fixedDeltaTime);
-            
-            previousVelocity = new List<float> { rb.linearVelocityX, rb.linearVelocityY };
-            
-            Debug.Log($"VelX : {previousVelocity[0]} VelY : {previousVelocity[1]} Vel : {rb.linearVelocity} TargetAccel : {targetAcceleration} CurrentAccel : {currentAcceleration}");
+            _animationController.ChangeAnimation(transform.eulerAngles, rb.linearVelocity.magnitude);
         }
 
         public void Interact()
