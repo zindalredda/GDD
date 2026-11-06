@@ -97,6 +97,8 @@ namespace GDD.Player
         {
             rb.linearVelocity = ReturnCalculatedAcceleration();
             this.transform.eulerAngles = ReturnCalculatedRotation();
+            
+            DebugMessage();
         }
 
         // 로그용
@@ -108,7 +110,7 @@ namespace GDD.Player
             
             previousVelocity = new List<float> { rb.linearVelocityX, rb.linearVelocityY };
             
-            Debug.Log($"VelX : {previousVelocity[0]} VelY : {previousVelocity[1]} TargetAccel : {targetAcceleration} CurrentAccel : {currentAcceleration}");
+            Debug.Log($"VelX : {previousVelocity[0]} VelY : {previousVelocity[1]} Vel : {rb.linearVelocity} TargetAccel : {targetAcceleration} CurrentAccel : {currentAcceleration}");
         }
 
         public void Interact()
